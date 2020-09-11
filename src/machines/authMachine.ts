@@ -139,11 +139,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         };
 
         // Set Access Token in Local Storage for API calls
-        localStorage.setItem(
-          process.env.REACT_APP_AUTH_TOKEN_NAME!,
-          "test"
-          //event.user.signInUserSession.accessToken.jwtToken
-        );
+        localStorage.setItem(process.env.REACT_APP_AUTH_TOKEN_NAME!, event.token);
 
         return Promise.resolve(ourUser);
       },
