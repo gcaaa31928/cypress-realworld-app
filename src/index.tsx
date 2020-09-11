@@ -24,7 +24,7 @@ ReactDOM.render(
         <Security
           issuer={`https://${process.env.REACT_APP_OKTA_DOMAIN}/oauth2/default`}
           clientId={process.env.REACT_APP_OKTA_CLIENTID}
-          redirectUri={window.location.origin}
+          redirectUri={window.location.origin + "/implicit/callback"}
         >
           <AppOkta />
         </Security>

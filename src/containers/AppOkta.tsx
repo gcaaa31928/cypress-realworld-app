@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 import { useService, useMachine } from "@xstate/react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
+// @ts-ignore
+import { LoginCallback, SecureRoute, useOktaAuth, withOktaAuth } from "@okta/okta-react";
+import { Route } from "react-router-dom";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
 import { notificationsMachine } from "../machines/notificationsMachine";
@@ -9,8 +12,6 @@ import { authService } from "../machines/authMachine";
 import AlertBar from "../components/AlertBar";
 import { bankAccountsMachine } from "../machines/bankAccountsMachine";
 import PrivateRoutesContainer from "./PrivateRoutesContainer";
-// @ts-ignore
-import { SecureRoute, useOktaAuth, withOktaAuth } from "@okta/okta-react";
 
 // @ts-ignore
 if (window.Cypress) {
@@ -50,7 +51,7 @@ const AppOkta: React.FC = () => {
     useEffect(() => {
       if (oktaAuthState.isAuthenticated) {
         oktaAuthService.getUser().then((user: any) => {
-          oktaAuthService.send("OKTA", { user, token: oktaAuthState.accessToken });
+          authService.send("OKTA", { user, token: oktaAuthState.accessToken });
         });
       }
     }, [oktaAuthState, oktaAuthService]);
@@ -74,7 +75,12 @@ const AppOkta: React.FC = () => {
           bankAccountsService={bankAccountsService}
         />
       )}
-      {authState.matches("unauthorized") && <SecureRoute exact path="/" />}
+      {authState.matches("unauthorized") && (
+        <>
+          <Route path="/implicit/callback" component={LoginCallback} />
+          <SecureRoute exact path="/" />
+        </>
+      )}
 
       <AlertBar snackbarService={snackbarService} />
     </div>

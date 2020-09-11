@@ -133,6 +133,9 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         const ourUser = {
           id: event.user.sub,
           email: event.user.email,
+          firstName: event.user.given_name,
+          lastName: event.user.family_name,
+          username: event.user.preferred_username,
         };
 
         // Set Access Token in Local Storage for API calls
