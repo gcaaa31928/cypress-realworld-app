@@ -4,6 +4,8 @@
 import { pick } from "lodash/fp";
 import { format as formatDate } from "date-fns";
 import { isMobile } from "./utils";
+// @ts-ignore
+import OktaAuth from "@okta/okta-auth-js";
 
 Cypress.Commands.add("getBySel", (selector, ...args) => {
   return cy.get(`[data-test=${selector}]`, ...args);
@@ -295,5 +297,47 @@ Cypress.Commands.add("database", (operation, entity, query, logTask = false) => 
     log.snapshot();
     log.end();
     return data;
+  });
+});
+
+Cypress.Commands.add("loginByOktaApi", (username: string, password: string) => {
+  cy.log(`Logging in as ${username}`);
+
+  cy.request({
+    method: "POST",
+    url: `https://${Cypress.env("okta_domain")}/api/v1/authn`,
+    body: {
+      username,
+      password,
+    },
+  }).then(({ body }) => {
+    const user = body._embedded.user;
+
+    const userItem = {
+      token: body.sessionToken,
+      user: {
+        sub: user.id,
+        email: user.profile.login,
+        given_name: user.profile.firstName,
+        family_name: user.profile.lastName,
+        preferred_username: user.profile.login,
+      },
+    };
+
+    window.localStorage.setItem("oktaCypress", JSON.stringify(userItem));
+    // Set cookies
+    //cy.setCookie("okta-oauth-nonce", "value of this cookie copied from the browser");
+    //cy.setCookie("okta-oauth-state", "value of this cookie copied from the browser");
+
+    // To avoid token expiration, we create a new timestamp every time
+    //const oneDayFromNow = Date.now() + 1000 * 60 * 60 * 24;
+
+    // Remember to replace all instances of "expiresAt":"{someTimeStampHere}",
+    // with "expiresAt":${oneDayFromNow}
+    // use backticks `` for string interpolation
+    //localStorage.setItem("okta-token-storage", `edited value of this item from the browser`);
+    //localStorage.setItem("okta-cache-storage", `{"expiresAt":${oneDayFromNow}}`);
+
+    cy.visit("/");
   });
 });

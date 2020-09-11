@@ -39,13 +39,13 @@ const AppOkta: React.FC = () => {
   // @ts-ignore
   if (window.Cypress) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    /*useEffect(() => {
-      const auth0 = JSON.parse(localStorage.getItem("auth0Cypress")!);
-      authService.send("AUTH0", {
-        user: auth0.body.decodedToken.user,
-        token: auth0.body.access_token,
+    useEffect(() => {
+      const okta = JSON.parse(localStorage.getItem("oktaCypress")!);
+      authService.send("OKTA", {
+        user: okta.user,
+        token: okta.token,
       });
-    }, []);*/
+    }, []);
   } else {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
