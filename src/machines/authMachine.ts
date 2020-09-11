@@ -130,7 +130,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       },
       getOktaUserProfile: (ctx, event: any) => {
         // Map Okta User fields to our User Model
-        const ourUser = {
+        const user = {
           id: event.user.sub,
           email: event.user.email,
           firstName: event.user.given_name,
@@ -141,7 +141,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         // Set Access Token in Local Storage for API calls
         localStorage.setItem(process.env.REACT_APP_AUTH_TOKEN_NAME!, event.token);
 
-        return Promise.resolve(ourUser);
+        return Promise.resolve({ user });
       },
       getUserProfile: async (ctx, event) => {
         const resp = await httpClient.get(`http://localhost:3001/checkAuth`);
