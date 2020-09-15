@@ -312,19 +312,54 @@ Cypress.Commands.add("loginByOktaApi", (username: string, password: string) => {
     },
   }).then(({ body }) => {
     const user = body._embedded.user;
-
-    const userItem = {
-      token: body.sessionToken,
-      user: {
-        sub: user.id,
-        email: user.profile.login,
-        given_name: user.profile.firstName,
-        family_name: user.profile.lastName,
-        preferred_username: user.profile.login,
-      },
+    const config = {
+      issuer: `https://${Cypress.env("okta_domain")}`,
+      clientId: Cypress.env("okta_client_id"),
+      redirectUri: "http://localhost:3000/implicit/callback",
+      scope: ["openid", "email", "profile"],
     };
 
-    window.localStorage.setItem("oktaCypress", JSON.stringify(userItem));
+    const authClient = new OktaAuth(config);
+
+    return authClient.token
+      .getWithoutPrompt({
+        sessionToken: body.sessionToken,
+        responseType: "id_token",
+      })
+      .then((res: any) => {
+        const tokens = res.tokens;
+        console.log("Tokens: ", tokens);
+
+        const decodedToken = authClient.token.decode(tokens.idToken.value);
+        console.log(decodedToken);
+        const userItem = {
+          token: tokens.accessToken,
+          user: {
+            sub: user.id,
+            email: user.profile.login,
+            given_name: user.profile.firstName,
+            family_name: user.profile.lastName,
+            preferred_username: user.profile.login,
+          },
+        };
+
+        window.localStorage.setItem("oktaCypress", JSON.stringify(userItem));
+        cy.visit("/");
+      });
+
+    /*
+    cy.request({
+      method: "GET",
+      url: `https://${Cypress.env("okta_domain")}/oauth2/default/v1/authorize`,
+      qs: {
+        client_id: Cypress.env("okta_client_id"),
+        response_type: "id_token",
+        sessionToken: body.sessionToken,
+        state: "abc123",
+      },
+    }).then(({ body: authorizeBody }) => {});
+    */
+
     // Set cookies
     //cy.setCookie("okta-oauth-nonce", "value of this cookie copied from the browser");
     //cy.setCookie("okta-oauth-state", "value of this cookie copied from the browser");
@@ -337,7 +372,5 @@ Cypress.Commands.add("loginByOktaApi", (username: string, password: string) => {
     // use backticks `` for string interpolation
     //localStorage.setItem("okta-token-storage", `edited value of this item from the browser`);
     //localStorage.setItem("okta-cache-storage", `{"expiresAt":${oneDayFromNow}}`);
-
-    cy.visit("/");
   });
 });

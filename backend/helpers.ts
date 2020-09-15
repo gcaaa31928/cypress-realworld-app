@@ -14,10 +14,10 @@ const oktaJwtConfig = {
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${REACT_APP_OKTA_DOMAIN}/oauth2/default/v1/keys`,
+    jwksUri: `https://${process.env.REACT_APP_OKTA_DOMAIN}/oauth2/default/v1/keys`,
   }),
 
-  issuer: `https://${REACT_APP_OKTA_DOMAIN}`,
+  issuer: `https://${process.env.REACT_APP_OKTA_DOMAIN}`,
   algorithms: ["RS256"],
 };
 
