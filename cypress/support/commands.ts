@@ -313,7 +313,7 @@ Cypress.Commands.add("loginByOktaApi", (username: string, password: string) => {
   }).then(({ body }) => {
     const user = body._embedded.user;
     const config = {
-      issuer: `https://${Cypress.env("okta_domain")}`,
+      issuer: `https://${Cypress.env("okta_domain")}/oauth2/default`,
       clientId: Cypress.env("okta_client_id"),
       redirectUri: "http://localhost:3000/implicit/callback",
       scope: ["openid", "email", "profile"],
@@ -333,7 +333,7 @@ Cypress.Commands.add("loginByOktaApi", (username: string, password: string) => {
         const decodedToken = authClient.token.decode(tokens.idToken.value);
         console.log(decodedToken);
         const userItem = {
-          token: tokens.accessToken,
+          token: tokens.accessToken.value,
           user: {
             sub: user.id,
             email: user.profile.login,

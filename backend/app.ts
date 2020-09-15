@@ -60,7 +60,7 @@ if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "development") {
 app.use(auth);
 
 if (process.env.REACT_APP_OKTA) {
-  //app.use(checkJwt);
+  app.use(checkJwt);
 }
 app.use("/users", userRoutes);
 app.use("/contacts", contactRoutes);
